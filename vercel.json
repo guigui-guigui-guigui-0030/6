@@ -1,0 +1,27 @@
+{
+  "functions": {
+    "api/upload.js": {
+      "maxDuration": 30
+    },
+    "api/knowledge.js": {
+      "maxDuration": 10
+    },
+    "api/statistics.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/upload",
+      "destination": "/api/upload.js"
+    },
+    {
+      "source": "/api/knowledge/(.*)",
+      "destination": "/api/knowledge.js"
+    },
+    {
+      "source": "/api/statistics/(.*)",
+      "destination": "/api/statistics.js"
+    }
+  ]
+}

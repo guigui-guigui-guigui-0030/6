@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE AI BOT 知識資料庫</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+            .header h1 {
+                color: #4a5568;
+                font-size: 2.5em;
+                margin-bottom: 10px;
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .header p {
+                color: #718096;
+                font-size: 1.1em;
+            }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+            .tab.active {
+                background: rgba(255, 255, 255, 0.9);
+                color: #4a5568;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-area {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+            margin-bottom: 20px;
+        }
+
+            .upload-area:hover {
+                border-color: #667eea;
+                background: #edf2f7;
+            }
+
+            .upload-area.dragover {
+                border-color: #667eea;
+                background: #e6fffa;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: #4a5568;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            }
+
+            .btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .knowledge-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+            .knowledge-item:hover {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                transform: translateX(5px);
+            }
+
+            .knowledge-item h3 {
+                color: #2d3748;
+                margin-bottom: 10px;
+            }
+
+            .knowledge-item p {
+                color: #718096;
+                margin-bottom: 10px;
+            }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+            .stat-card h3 {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+            }
+
+            .stat-card p {
+                opacity: 0.9;
+            }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+            .search-bar input {
+                flex: 1;
+            }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 LINE AI BOT 知識資料庫</h1>
+            <p>專業職人知識管理系統</p>
+            <div style="margin-top: 15px;">
+                <label for="userId" style="display: inline-block; margin-right: 10px;">用戶 ID:</label>
+                <input type="text" id="userId" value="user123" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('upload')">📁 文件上傳</button>
+            <button class="tab" onclick="switchTab('knowledge')">📚 知識管理</button>
+            <button class="tab" onclick="switchTab('search')">🔍 搜尋功能</button>
+            <button class="tab" onclick="switchTab('statistics')">📊 統計分析</button>
+        </div>
+
+        <!-- 文件上傳 -->
+        <div id="upload" class="tab-content active">
+            <h2>📁 文件上傳</h2>
+            <div class="upload-area" id="uploadArea">
+                <div style="font-size: 3em; margin-bottom: 15px;">📎</div>
+                <p>拖拽文件到此處或點擊選擇文件</p>
+                <p style="font-size: 14px; color: #718096; margin-top: 10px;">
+                    支援格式: PDF, Word (.doc/.docx), 文字文件 (.txt), Markdown (.md)
+                </p>
+                <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt,.md" style="display: none;">
+            </div>
+
+            <div class="form-group">
+                <label for="category">分類</label>
+                <select id="category" class="form-control">
+                    <option value="">選擇分類</option>
+                    <option value="技術文件">技術文件</option>
+                    <option value="操作手冊">操作手冊</option>
+                    <option value="知識庫">知識庫</option>
+                    <option value="FAQ">FAQ</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tags">標籤 (用逗號分隔)</label>
+                <input type="text" id="tags" class="form-control" placeholder="例: Python, Flask, API">
+            </div>
+
+            <button class="btn" onclick="uploadFiles()" id="uploadBtn">
+                <span id="uploadText">上傳文件</span>
+            </button>
+
+            <div id="uploadProgress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p id="progressText" style="margin-top: 10px; text-align: center;">上傳中...</p>
+            </div>
+
+            <div id="uploadResults"></div>
+        </div>
+
+        <!-- 知識管理 -->
+        <div id="knowledge" class="tab-content">
+            <h2>📚 知識管理</h2>
+            <div class="search-bar">
+                <select id="knowledgeCategory" class="form-control">
+                    <option value="">所有分類</option>
+                    <option value="技術文件">技術文件</option>
+                    <option value="操作手冊">操作手冊</option>
+                    <option value="知識庫">知識庫</option>
+                    <option value="FAQ">FAQ</option>
+                </select>
+                <button class="btn" onclick="loadKnowledge()">載入知識</button>
+            </div>
+            <div id="knowledgeList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>點擊"載入知識"查看您的知識庫內容</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜尋功能 -->
+        <div id="search" class="tab-content">
+            <h2>🔍 搜尋功能</h2>
+            <div class="search-bar">
+                <input type="text" id="searchQuery" class="form-control" placeholder="輸入搜尋關鍵字...">
+                <select id="searchCategory" class="form-control" style="max-width: 200px;">
+                    <option value="">所有分類</option>
+                    <option value="技術文件">技術文件</option>
+                    <option value="操作手冊">操作手冊</option>
+                    <option value="知識庫">知識庫</option>
+                    <option value="FAQ">FAQ</option>
+                </select>
+                <button class="btn" onclick="searchKnowledge()">搜尋</button>
+            </div>
+            <div id="searchResults">
+                <div class="loading">
+                    <p>輸入關鍵字開始搜尋您的知識庫</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 統計分析 -->
+        <div id="statistics" class="tab-content">
+            <h2>📊 統計分析</h2>
+            <button class="btn" onclick="loadStatistics()" style="margin-bottom: 20px;">載入統計資料</button>
+
+            <div id="statsContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>點擊"載入統計資料"查看您的統計數據</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全域變數
+        const API_BASE = '/api';
+        let selectedFiles = [];
+
+        // 標籤切換
+        function switchTab(tabName) {
+            // 隱藏所有內容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // 移除所有標籤的 active 狀態
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 顯示選中的內容
+            document.getElementById(tabName).classList.add('active');
+
+            // 添加選中標籤的 active 狀態
+            event.target.classList.add('active');
+        }
+
+        // 文件上傳相關
+        document.addEventListener('DOMContentLoaded', function () {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            // 點擊上傳區域
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // 文件選擇
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // 拖拽功能
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleFiles(files);
+            });
+        });
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            selectedFiles = files;
+            updateUploadArea();
+        }
+
+        function updateUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            if (selectedFiles.length > 0) {
+                uploadArea.innerHTML = `
+                        <div style="font-size: 2em; margin-bottom: 15px;">✅</div>
+                        <p>已選擇 ${selectedFiles.length} 個文件</p>
+                        <div style="margin-top: 10px;">
+                            ${selectedFiles.map(file => `<div style="font-size: 14px; color: #718096;">${file.name}</div>`).join('')}
+                        </div>
+                    `;
+            }
+        }
+
+        // 上傳文件
+        async function uploadFiles() {
+            if (selectedFiles.length === 0) {
+                showAlert('請先選擇文件', 'error');
+                return;
+            }
+
+            const userId = document.getElementById('userId').value;
+            const category = document.getElementById('category').value;
+            const tags = document.getElementById('tags').value;
+
+            if (!userId) {
+                showAlert('請輸入用戶 ID', 'error');
+                return;
+            }
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadProgress = document.getElementById('uploadProgress');
+
+            uploadBtn.disabled = true;
+            uploadProgress.style.display = 'block';
+
+            try {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('user_id', userId);
+                    if (category) formData.append('category', category);
+                    if (tags) formData.append('tags', tags);
+
+                    // 真實 API 調用
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('上傳失敗');
+                    }
+
+                    const result = await response.json();
+                    console.log('Upload result:', result);
+                }
+
+                showAlert(`成功上傳 ${selectedFiles.length} 個文件！`, 'success');
+                resetUploadForm();
+            } catch (error) {
+                showAlert('上傳失敗: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadProgress.style.display = 'none';
+            }
+        }
+
+        // 模擬上傳（實際使用時替換為真實 API 調用）
+        function simulateUpload(formData) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('Upload simulation:', formData.get('file').name);
+                    resolve();
+                }, 1000);
+            });
+        }
+
+        function resetUploadForm() {
+            selectedFiles = [];
+            document.getElementById('fileInput').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('tags').value = '';
+            document.getElementById('uploadArea').innerHTML = `
+                    <div style="font-size: 3em; margin-bottom: 15px;">📎</div>
+                    <p>拖拽文件到此處或點擊選擇文件</p>
+                    <p style="font-size: 14px; color: #718096; margin-top: 10px;">
+                        支援格式: PDF, Word (.doc/.docx), 文字文件 (.txt), Markdown (.md)
+                    </p>
+                `;
+        }
+
+        // 載入知識庫
+        async function loadKnowledge() {
+            const userId = document.getElementById('userId').value;
+            const category = document.getElementById('knowledgeCategory').value;
+
+            let url = `/api/knowledge?user_id=${userId}`;
+            if (category) {
+                url += `&category=${encodeURIComponent(category)}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('載入失敗');
+                }
+
+                const data = await response.json();
+                displayKnowledge(data.results);
+            } catch (error) {
+                knowledgeList.innerHTML = '<div class="alert alert-error">載入失敗: ' + error.message + '</div>';
+            }
+        }
+
+        function displayKnowledge(knowledge) {
+            const knowledgeList = document.getElementById('knowledgeList');
+
+            if (knowledge.length === 0) {
+                knowledgeList.innerHTML = '<div class="loading"><p>暫無知識內容</p></div>';
+                return;
+            }
+
+            knowledgeList.innerHTML = knowledge.map(item => `
+                    <div class="knowledge-item">
+                        <h3>${item.title}</h3>
+                        <p>${item.content}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                            <div>
+                                <span style="font-size: 12px; color: #718096;">
+                                    📁 ${item.category} | 📄 ${item.file_type} | 📅 ${item.created_at}
+                                </span>
+                            </div>
+                            <div class="tags">
+                                ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // 搜尋功能
+        async function searchKnowledge() {
+            const userId = document.getElementById('userId').value;
+            const query = document.getElementById('searchQuery').value;
+            const category = document.getElementById('searchCategory').value;
+
+            if (!userId) {
+                showAlert('請輸入用戶 ID', 'error');
+                return;
+            }
+
+            if (!query.trim()) {
+                showAlert('請輸入搜尋關鍵字', 'error');
+                return;
+            }
+
+            const searchResults = document.getElementById('searchResults');
+            searchResults.innerHTML = '<div class="loading"><div class="spinner"></div><p>搜尋中...</p></div>';
+
+            try {
+                // 模擬搜尋結果
+                const mockResults = [
+                    {
+                        id: '1',
+                        title: 'Flask API 開發指南',
+                        content: '...包含完整的 API 開發流程，從路由設計到資料庫操作...',
+                        category: '技術文件',
+                        tags: ['Python', 'Flask', 'API'],
+                        score: 0.95
+                    }
+                ].filter(item =>
+                    item.title.includes(query) ||
+                    item.content.includes(query) ||
+                    item.tags.some(tag => tag.includes(query))
+                );
+
+                displaySearchResults(mockResults, query);
+            } catch (error) {
+                searchResults.innerHTML = '<div class="alert alert-error">搜尋失敗: ' + error.message + '</div>';
+            }
+        }
+
+        function displaySearchResults(results, query) {
+            const searchResults = document.getElementById('searchResults');
+
+            if (results.length === 0) {
+                searchResults.innerHTML = `<div class="loading"><p>沒有找到包含 "${query}" 的內容</p></div>`;
+                return;
+            }
+
+            searchResults.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #718096;">找到 ${results.length} 個相關結果</p>
+                    </div>
+                    ${results.map(item => `
+                        <div class="knowledge-item">
+                            <h3>${highlightText(item.title, query)}</h3>
+                            <p>${highlightText(item.content, query)}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                                <div>
+                                    <span style="font-size: 12px; color: #718096;">
+                                        📁 ${item.category} | 🎯 相關度: ${Math.round(item.score * 100)}%
+                                    </span>
+                                </div>
+                                <div class="tags">
+                                    ${item.tags.map(tag => `<span class="tag">${highlightText(tag, query)}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+        }
+
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<mark style="background: #fef08a; padding: 2px 4px; border-radius: 3px;">$1</mark>');
+        }
+
+        // 載入統計資料
+        async function loadStatistics() {
+            const userId = document.getElementById('userId').value;
+
+            if (!userId) {
+                showAlert('請輸入用戶 ID', 'error');
+                return;
+            }
+
+            const statsContent = document.getElementById('statsContent');
+            statsContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>載入統計資料中...</p></div>';
+
+            try {
+                // 模擬統計數據
+                const mockStats = {
+                    total_files: 156,
+                    total_categories: 8,
+                    total_tags: 42,
+                    total_size_mb: 2340,
+                    categories: [
+                        { name: '技術文件', count: 45 },
+                        { name: '操作手冊', count: 32 },
+                        { name: '知識庫', count: 28 },
+                        { name: 'FAQ', count: 51 }
+                    ],
+                    file_types: [
+                        { type: 'PDF', count: 89 },
+                        { type: 'DOCX', count: 34 },
+                        { type: 'TXT', count: 23 },
+                        { type: 'MD', count: 10 }
+                    ]
+                };
+
+                displayStatistics(mockStats);
+            } catch (error) {
+                statsContent.innerHTML = '<div class="alert alert-error">載入統計資料失敗: ' + error.message + '</div>';
+            }
+        }
+
+        function displayStatistics(stats) {
+            const statsContent = document.getElementById('statsContent');
+
+            statsContent.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>${stats.total_files}</h3>
+                            <p>總文件數</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>${stats.total_categories}</h3>
+                            <p>分類數量</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>${stats.total_tags}</h3>
+                            <p>標籤數量</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>${(stats.total_size_mb / 1024).toFixed(1)}GB</h3>
+                            <p>總儲存空間</p>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                        <div>
+                            <h3 style="margin-bottom: 20px;">📁 分類統計</h3>
+                            ${stats.categories.map(cat => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 10px;">
+                                    <span>${cat.name}</span>
+                                    <span style="background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px;">${cat.count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div>
+                            <h3 style="margin-bottom: 20px;">📄 文件類型統計</h3>
+                            ${stats.file_types.map(type => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f7fafc; border-radius: 8px; margin-bottom: 10px;">
+                                    <span>${type.type}</span>
+                                    <span style="background: #764ba2; color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px;">${type.count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+        }
+
+        // 顯示提示訊息
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+
+            // 插入到當前活動的標籤內容頂部
+            const activeContent = document.querySelector('.tab-content.active');
+            activeContent.insertBefore(alertDiv, activeContent.firstChild);
+
+            // 3秒後自動移除
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // 按 Enter 鍵搜尋
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchQuery');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        searchKnowledge();
+                    }
+                });
+            }
+        });
+
+        // 模擬 API 調用的函數（實際開發時替換為真實的 fetch 調用）
+        /*
+        實際 API 調用範例：
+
+        async function uploadFiles() {
+            const formData = new FormData();
+            // ... 準備數據
+
+            const response = await fetch(`${API_BASE}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('上傳失敗');
+            }
+
+            return await response.json();
+        }
+
+        async function loadKnowledge() {
+            const userId = document.getElementById('userId').value;
+            const category = document.getElementById('knowledgeCategory').value;
+
+            let url = `${API_BASE}/knowledge/${userId}`;
+            if (category) {
+                url += `?category=${encodeURIComponent(category)}`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('載入失敗');
+            }
+
+            return await response.json();
+        }
+
+        async function searchKnowledge() {
+            const userId = document.getElementById('userId').value;
+            const query = document.getElementById('searchQuery').value;
+            const category = document.getElementById('searchCategory').value;
+
+            let url = `${API_BASE}/knowledge/${userId}/search?q=${encodeURIComponent(query)}`;
+            if (category) {
+                url += `&category=${encodeURIComponent(category)}`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('搜尋失敗');
+            }
+
+            return await response.json();
+        }
+
+        async function loadStatistics() {
+            const userId = document.getElementById('userId').value;
+
+            const response = await fetch(`${API_BASE}/statistics/${userId}/dashboard`);
+            if (!response.ok) {
+                throw new Error('載入統計資料失敗');
+            }
+
+            return await response.json();
+        }
+        */
+    </script>
+</body>
+</html>

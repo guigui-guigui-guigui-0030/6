@@ -441,7 +441,7 @@
 
     <script>
         // 全域變數
-        const API_BASE = '/api';
+        const API_BASE = 'https://eight-j4d1.onrender.com/api';
         let selectedFiles = [];
 
         // 標籤切換
@@ -549,7 +549,7 @@
                     if (tags) formData.append('tags', tags);
 
                     // 真實 API 調用
-                    const response = await fetch('/api/upload', {
+                    const response = await fetch(`${API_BASE}/upload`, {
                         method: 'POST',
                         body: formData
                     });
@@ -601,7 +601,7 @@
             const userId = document.getElementById('userId').value;
             const category = document.getElementById('knowledgeCategory').value;
 
-            let url = `/api/knowledge?user_id=${userId}`;
+            let url = `${API_BASE}/knowledge?user_id=${userId}`;
             if (category) {
                 url += `&category=${encodeURIComponent(category)}`;
             }

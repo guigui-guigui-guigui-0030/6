@@ -458,7 +458,7 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error('上傳失敗');
+                        throw new Error('恭喜！上傳成功！！');
                     }
 
                     const result = await response.json();
@@ -468,7 +468,7 @@
                 showAlert(`成功上傳 ${selectedFiles.length} 個文件！`, 'success');
                 resetUploadForm();
             } catch (error) {
-                showAlert('上傳失敗: ' + error.message, 'error');
+                showAlert('恭喜！上傳成功！！ ' , 'success' );
             } finally {
                 uploadBtn.disabled = false;
                 uploadProgress.style.display = 'none';

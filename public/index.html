@@ -171,45 +171,6 @@
                 transform: none;
             }
 
-        .knowledge-item {
-            background: #f7fafc;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s ease;
-        }
-
-            .knowledge-item:hover {
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                transform: translateX(5px);
-            }
-
-            .knowledge-item h3 {
-                color: #2d3748;
-                margin-bottom: 10px;
-            }
-
-            .knowledge-item p {
-                color: #718096;
-                margin-bottom: 10px;
-            }
-
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .tag {
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -233,16 +194,6 @@
 
             .stat-card p {
                 opacity: 0.9;
-            }
-
-        .search-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-            .search-bar input {
-                flex: 1;
             }
 
         .loading {
@@ -316,10 +267,6 @@
             .tabs {
                 flex-direction: column;
             }
-
-            .search-bar {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
@@ -336,8 +283,6 @@
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('upload')">📁 文件上傳</button>
-            <button class="tab" onclick="switchTab('knowledge')">📚 知識管理</button>
-            <button class="tab" onclick="switchTab('search')">🔍 搜尋功能</button>
             <button class="tab" onclick="switchTab('statistics')">📊 統計分析</button>
         </div>
 
@@ -381,48 +326,6 @@
             </div>
 
             <div id="uploadResults"></div>
-        </div>
-
-        <!-- 知識管理 -->
-        <div id="knowledge" class="tab-content">
-            <h2>📚 知識管理</h2>
-            <div class="search-bar">
-                <select id="knowledgeCategory" class="form-control">
-                    <option value="">所有分類</option>
-                    <option value="技術文件">技術文件</option>
-                    <option value="操作手冊">操作手冊</option>
-                    <option value="知識庫">知識庫</option>
-                    <option value="FAQ">FAQ</option>
-                </select>
-                <button class="btn" onclick="loadKnowledge()">載入知識</button>
-            </div>
-            <div id="knowledgeList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>點擊"載入知識"查看您的知識庫內容</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 搜尋功能 -->
-        <div id="search" class="tab-content">
-            <h2>🔍 搜尋功能</h2>
-            <div class="search-bar">
-                <input type="text" id="searchQuery" class="form-control" placeholder="輸入搜尋關鍵字...">
-                <select id="searchCategory" class="form-control" style="max-width: 200px;">
-                    <option value="">所有分類</option>
-                    <option value="技術文件">技術文件</option>
-                    <option value="操作手冊">操作手冊</option>
-                    <option value="知識庫">知識庫</option>
-                    <option value="FAQ">FAQ</option>
-                </select>
-                <button class="btn" onclick="searchKnowledge()">搜尋</button>
-            </div>
-            <div id="searchResults">
-                <div class="loading">
-                    <p>輸入關鍵字開始搜尋您的知識庫</p>
-                </div>
-            </div>
         </div>
 
         <!-- 統計分析 -->
@@ -572,16 +475,6 @@
             }
         }
 
-        // 模擬上傳（實際使用時替換為真實 API 調用）
-        function simulateUpload(formData) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    console.log('Upload simulation:', formData.get('file').name);
-                    resolve();
-                }, 1000);
-            });
-        }
-
         function resetUploadForm() {
             selectedFiles = [];
             document.getElementById('fileInput').value = '';
@@ -594,134 +487,6 @@
                         支援格式: PDF, Word (.doc/.docx), 文字文件 (.txt), Markdown (.md)
                     </p>
                 `;
-        }
-
-        // 載入知識庫
-        async function loadKnowledge() {
-            const userId = document.getElementById('userId').value;
-            const category = document.getElementById('knowledgeCategory').value;
-
-            let url = `${API_BASE}/knowledge?user_id=${userId}`;
-            if (category) {
-                url += `&category=${encodeURIComponent(category)}`;
-            }
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('載入失敗');
-                }
-
-                const data = await response.json();
-                displayKnowledge(data.results);
-            } catch (error) {
-                knowledgeList.innerHTML = '<div class="alert alert-error">載入失敗: ' + error.message + '</div>';
-            }
-        }
-
-        function displayKnowledge(knowledge) {
-            const knowledgeList = document.getElementById('knowledgeList');
-
-            if (knowledge.length === 0) {
-                knowledgeList.innerHTML = '<div class="loading"><p>暫無知識內容</p></div>';
-                return;
-            }
-
-            knowledgeList.innerHTML = knowledge.map(item => `
-                    <div class="knowledge-item">
-                        <h3>${item.title}</h3>
-                        <p>${item.content}</p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                            <div>
-                                <span style="font-size: 12px; color: #718096;">
-                                    📁 ${item.category} | 📄 ${item.file_type} | 📅 ${item.created_at}
-                                </span>
-                            </div>
-                            <div class="tags">
-                                ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-        }
-
-        // 搜尋功能
-        async function searchKnowledge() {
-            const userId = document.getElementById('userId').value;
-            const query = document.getElementById('searchQuery').value;
-            const category = document.getElementById('searchCategory').value;
-
-            if (!userId) {
-                showAlert('請輸入用戶 ID', 'error');
-                return;
-            }
-
-            if (!query.trim()) {
-                showAlert('請輸入搜尋關鍵字', 'error');
-                return;
-            }
-
-            const searchResults = document.getElementById('searchResults');
-            searchResults.innerHTML = '<div class="loading"><div class="spinner"></div><p>搜尋中...</p></div>';
-
-            try {
-                // 模擬搜尋結果
-                const mockResults = [
-                    {
-                        id: '1',
-                        title: 'Flask API 開發指南',
-                        content: '...包含完整的 API 開發流程，從路由設計到資料庫操作...',
-                        category: '技術文件',
-                        tags: ['Python', 'Flask', 'API'],
-                        score: 0.95
-                    }
-                ].filter(item =>
-                    item.title.includes(query) ||
-                    item.content.includes(query) ||
-                    item.tags.some(tag => tag.includes(query))
-                );
-
-                displaySearchResults(mockResults, query);
-            } catch (error) {
-                searchResults.innerHTML = '<div class="alert alert-error">搜尋失敗: ' + error.message + '</div>';
-            }
-        }
-
-        function displaySearchResults(results, query) {
-            const searchResults = document.getElementById('searchResults');
-
-            if (results.length === 0) {
-                searchResults.innerHTML = `<div class="loading"><p>沒有找到包含 "${query}" 的內容</p></div>`;
-                return;
-            }
-
-            searchResults.innerHTML = `
-                    <div style="margin-bottom: 20px;">
-                        <p style="color: #718096;">找到 ${results.length} 個相關結果</p>
-                    </div>
-                    ${results.map(item => `
-                        <div class="knowledge-item">
-                            <h3>${highlightText(item.title, query)}</h3>
-                            <p>${highlightText(item.content, query)}</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                                <div>
-                                    <span style="font-size: 12px; color: #718096;">
-                                        📁 ${item.category} | 🎯 相關度: ${Math.round(item.score * 100)}%
-                                    </span>
-                                </div>
-                                <div class="tags">
-                                    ${item.tags.map(tag => `<span class="tag">${highlightText(tag, query)}</span>`).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                `;
-        }
-
-        function highlightText(text, query) {
-            if (!query) return text;
-            const regex = new RegExp(`(${query})`, 'gi');
-            return text.replace(regex, '<mark style="background: #fef08a; padding: 2px 4px; border-radius: 3px;">$1</mark>');
         }
 
         // 載入統計資料
@@ -825,85 +590,6 @@
                 alertDiv.remove();
             }, 3000);
         }
-
-        // 按 Enter 鍵搜尋
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('searchQuery');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        searchKnowledge();
-                    }
-                });
-            }
-        });
-
-        // 模擬 API 調用的函數（實際開發時替換為真實的 fetch 調用）
-        /*
-        實際 API 調用範例：
-
-        async function uploadFiles() {
-            const formData = new FormData();
-            // ... 準備數據
-
-            const response = await fetch(`${API_BASE}/upload`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('上傳失敗');
-            }
-
-            return await response.json();
-        }
-
-        async function loadKnowledge() {
-            const userId = document.getElementById('userId').value;
-            const category = document.getElementById('knowledgeCategory').value;
-
-            let url = `${API_BASE}/knowledge/${userId}`;
-            if (category) {
-                url += `?category=${encodeURIComponent(category)}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('載入失敗');
-            }
-
-            return await response.json();
-        }
-
-        async function searchKnowledge() {
-            const userId = document.getElementById('userId').value;
-            const query = document.getElementById('searchQuery').value;
-            const category = document.getElementById('searchCategory').value;
-
-            let url = `${API_BASE}/knowledge/${userId}/search?q=${encodeURIComponent(query)}`;
-            if (category) {
-                url += `&category=${encodeURIComponent(category)}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('搜尋失敗');
-            }
-
-            return await response.json();
-        }
-
-        async function loadStatistics() {
-            const userId = document.getElementById('userId').value;
-
-            const response = await fetch(`${API_BASE}/statistics/${userId}/dashboard`);
-            if (!response.ok) {
-                throw new Error('載入統計資料失敗');
-            }
-
-            return await response.json();
-        }
-        */
     </script>
 </body>
 </html>

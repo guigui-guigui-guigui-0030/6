@@ -368,9 +368,19 @@
 
         // 文件上傳相關
         document.addEventListener('DOMContentLoaded', function () {
+           
+            const urlParams = new URLSearchParams(window.location.search);
+            const userIdFromUrl = urlParams.get('user_id');
+            
+            if (userIdFromUrl) {
+               document.getElementById('userId').value = userIdFromUrl;
+               // 可選：顯示提示訊息
+               showAlert('已自動填入用戶 ID', 'success');
+            }
+            
             const uploadArea = document.getElementById('uploadArea');
             const fileInput = document.getElementById('fileInput');
-
+            
             // 點擊上傳區域
             uploadArea.addEventListener('click', () => {
                 fileInput.click();
@@ -395,6 +405,11 @@
                 const files = Array.from(e.dataTransfer.files);
                 handleFiles(files);
             });
+
+
+
+
+            
         });
 
         function handleFileSelect(e) {
